@@ -1,6 +1,6 @@
+import { createInjectableType } from "@angular/compiler";
 import { EventEmitter } from "@angular/core";
 import { Ingredient } from "src/app/shared/ingredients.model";
-
 export class ShoppingListService {
 
   private ingredients : Ingredient[] = [
@@ -20,5 +20,15 @@ export class ShoppingListService {
   addIngredient(ingredient: Ingredient){
     this.ingredients.push(ingredient)
     this.ingredientsChanged.emit(this.getIngredients())
+  }
+
+  addIngredients(ingredients:Ingredient[]){
+    // for(let ingredient of ingredients){
+    //   this.addIngredient(ingredient)
+    // }
+
+    this.ingredients.push(...ingredients)
+    this.ingredientsChanged.emit(this.ingredients.slice())
+
   }
 }

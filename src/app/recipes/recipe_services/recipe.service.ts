@@ -1,4 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
+import { Ingredient } from 'src/app/shared/ingredients.model';
+import { ShoppingListService } from 'src/app/shopping-list/shopping-list-services/shopping-list.service';
 import { Recipe } from '../recipe.model';
 
 @Injectable({
@@ -7,12 +9,38 @@ import { Recipe } from '../recipe.model';
 export class RecipeService {
 
   private recipes : Recipe[] = [
-    new Recipe("salad1","tomato","https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg"),
-    new Recipe("salad2","potato","https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg"),
-    new Recipe("salad3","eggplant","https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg"),
+    new Recipe(
+      "pasta",
+      "very good",
+      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      [
+        new Ingredient('tomato',3),
+        new Ingredient('mushroom',15),
+        new Ingredient('garlic',3)
+      ]),
+    new Recipe(
+      "noodle",
+      "best in the town",
+      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      [
+        new Ingredient('onion',1),
+        new Ingredient('pork',20),
+        new Ingredient('parsley',10)
+      ]
+      ),
+    new Recipe(
+      "paella",
+      "eggplant",
+      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      [ 
+        new Ingredient('green bean',15),
+        new Ingredient('chicken leg',6),
+        new Ingredient('snail',10)
+      ]
+      ),
   ]
 
-  constructor() { }
+  constructor(private slService:ShoppingListService) { }
 
   getRecipes(){
     //return this.recipes 
@@ -20,4 +48,8 @@ export class RecipeService {
   }
 
   recipeSelected=new EventEmitter<Recipe>();
+
+  addIngredientsToShoppingList(ingredients:Ingredient[]){
+    this.slService.addIngredients(ingredients)
+  }
 }
