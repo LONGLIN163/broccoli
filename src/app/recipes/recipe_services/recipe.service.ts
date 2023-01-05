@@ -47,6 +47,11 @@ export class RecipeService {
     return this.recipes.slice() // return a new arr object
   }
 
+  getRecipe(id:number):Recipe{
+     //return this.recipes[id]
+     return this.recipes.slice()[id] // this is better
+  }
+
   recipeSelected=new EventEmitter<Recipe>();
 
   addIngredientsToShoppingList(ingredients:Ingredient[]){

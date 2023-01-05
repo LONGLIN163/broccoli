@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { RecipeDetailComponent } from "./recipes/recipe-detail/recipe-detail.component";
 import { RecipeItemComponent } from "./recipes/recipe-list/recipe-item/recipe-item.component";
 import { RecipeStartComponent } from "./recipes/recipe-start/recipe-start.component";
 import { RecipesComponent } from "./recipes/recipes.component";
@@ -16,7 +17,7 @@ const appRoutes:Routes=[
         RecipesComponent,
         children:[
             {path:'',component:RecipeStartComponent},
-            {path:'id',component:RecipeDetailComponent}
+            {path:':id',component:RecipeDetailComponent}
         ]
     },
     {
