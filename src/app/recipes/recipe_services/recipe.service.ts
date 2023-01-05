@@ -12,7 +12,7 @@ export class RecipeService {
     new Recipe(
       "pasta",
       "very good",
-      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FEdit%2F09-2022-sausage-pasta%2Fsausage-pasta-4",
       [
         new Ingredient('tomato',3),
         new Ingredient('mushroom',15),
@@ -21,7 +21,7 @@ export class RecipeService {
     new Recipe(
       "noodle",
       "best in the town",
-      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      "https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/c4e7f587-e9e1-4953-b032-f58f82e91f4d/Derivates/4b8b814f-8562-4ad0-8db8-9939cb103685.jpg",
       [
         new Ingredient('onion',1),
         new Ingredient('pork',20),
@@ -31,7 +31,7 @@ export class RecipeService {
     new Recipe(
       "paella",
       "eggplant",
-      "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg",
+      "https://eatingoutorin.com/wp-content/uploads/2022/01/Mana-75-10-1024x768.jpg",
       [ 
         new Ingredient('green bean',15),
         new Ingredient('chicken leg',6),
@@ -47,9 +47,9 @@ export class RecipeService {
     return this.recipes.slice() // return a new arr object
   }
 
-  getRecipe(id:number):Recipe{
-     //return this.recipes[id]
-     return this.recipes.slice()[id] // this is better
+  getRecipe(index:number):Recipe{
+     //return this.recipes[index]
+     return this.recipes.slice()[index] // this is better
   }
 
   recipeSelected=new EventEmitter<Recipe>();
