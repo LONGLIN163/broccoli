@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-xs-12">
-        <form (onSubmit)="onAddItem(f)" #f="ngForm">
+        <form (ngSubmit)="onAddItem(f)" #f="ngForm">
             <div class="row">
                 <div class="col-sm-5 form-group">
                     <label for="name">Name</label>
@@ -26,7 +26,7 @@
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <button class="btn btn-success" type="button" [disabled]="!f.valid">add</button>
+                    <button class="btn btn-success" type="submit" [disabled]="!f.valid">add</button>
                     <button class="btn btn-danger" type="button">del</button>
                     <button class="btn btn-primary" type="button">clear</button>
                 </div>
