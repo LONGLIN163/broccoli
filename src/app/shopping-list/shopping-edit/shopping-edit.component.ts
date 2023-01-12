@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Ingredient } from 'src/app/shared/ingredients.model';
@@ -39,11 +39,21 @@ export class ShoppingEditComponent implements OnInit ,OnDestroy{
     )
   }
 
-  onAddItem(form: NgForm) {
-    console.log(2)
+  onSubmit(form: NgForm) {
     const value=form.value
     const newIngredient=new Ingredient(value.name, value.amount)
-    this.slService.addIngredient(newIngredient);
+    if(this.editMode){
+      this.slService.updateIngredient(this.editedItemIndex,newIngredient)
+    }else{
+      this.slService.addIngredient(newIngredient);
+    }
+    this.editMode=false
+    this.slForm.reset()
+  }
+
+  onClear(){
+    this.editMode=false
+    this.slForm.reset()
   }
 
 }
