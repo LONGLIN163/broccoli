@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Recipe } from '../recipe.model';
 import { RecipeService } from '../recipe_services/recipe.service';
 
 @Component({
@@ -69,6 +70,14 @@ export class RecipeEditComponent implements OnInit {
         amount: new FormControl(null,[Validators.required, Validators.pattern(/^[1-9][0-9]*$/)])
       })
     )
+  }
+
+  onSubmit(){
+    if(this.editModel){
+      this.recipeService.updateRecipe(this.id,this.recipeForm.value)
+    }else{
+      this.recipeService.addRecipe(this.recipeForm.value)
+    }
   }
 
 }
