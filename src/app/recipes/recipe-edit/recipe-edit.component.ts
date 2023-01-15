@@ -72,12 +72,18 @@ export class RecipeEditComponent implements OnInit {
     )
   }
 
+
+  onDeleteIngredient(index:number){    
+    (<FormArray>this.recipeForm.get('ingredients')).removeAt(index)
+  }
+
   onSubmit(){
     if(this.editModel){
       this.recipeService.updateRecipe(this.id,this.recipeForm.value)
     }else{
       this.recipeService.addRecipe(this.recipeForm.value)
     }
+    this.router.navigate(['../'],{relativeTo:this.route})
   }
 
   onCancel(){
