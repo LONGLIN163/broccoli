@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Subject, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Subject, tap, throwError } from 'rxjs';
 import { User } from './auth/user.model';
 
 export interface AuthResData{
@@ -17,7 +17,10 @@ export interface AuthResData{
 })
 export class AuthService {
 
-  user=new Subject<User>();
+  //user=new Subject<User>();
+  //token:string=null
+
+  user=new BehaviorSubject<User>(null)
 
   constructor(private http:HttpClient) { }
   signUp(email:string,password:string){
@@ -32,7 +35,7 @@ export class AuthService {
       catchError(this.handleError),
       tap(
         (resData) => { 
-        const expirationDate=new Date( // convert back everything back to Date format
+/*         const expirationDate=new Date( // convert back everything back to Date format
           new Date().getTime() //current timestamp in millisecond since the beginning of the time,1970
           +
           +resData.expiresIn*1000 // just convert second to millisecond
@@ -43,13 +46,13 @@ export class AuthService {
           resData.idToken,
           expirationDate
         )
-        this.user.next(user)
-        // this.handleAuthentication(
-        //   resData.email,
-        //   resData.localId,
-        //   resData.idToken,
-        //   +resData.expiresIn
-        // );
+        this.user.next(user) */
+        this.handleAuthentication(
+          resData.email,
+          resData.localId,
+          resData.idToken,
+          +resData.expiresIn
+        );
       })
     )
   }
