@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 
 interface AuthResData{
   idToken:string,
@@ -28,6 +28,15 @@ export class AuthService {
       password:password,
       returnSecureToken:true
     })
+    .pipe(catchError((errRes) => {
+       let errorMessage='An error occurred!!!'
+       if(!errRes.error || !errRes.error.error){
+        return throwError(errorMessage)
+       }
+       errorMessage=errRes.error.error.message
+       return throwError(errorMessage)
+     }
+    ))
   }
 
   login(){
