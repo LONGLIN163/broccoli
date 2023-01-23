@@ -24,7 +24,7 @@ export class DataStorageService {
     }
 
     fetchRecipes(){
-      return this.authService.user.pipe(
+/*       return this.authService.user.pipe(
         take(1), // take 1 value from the obs already exist,then automatically unsubscribe
         exhaustMap((user) => {
           return this.http
@@ -35,18 +35,24 @@ export class DataStorageService {
               params:new HttpParams().set('auth',user.token)
             }
           )
-        }),
-        map((recipes) => { // rxjs operrator
-          return recipes.map((recipe) => { // js array method
-            return {
-              ...recipe,
-              ingredients:recipe.ingredients ? recipe.ingredients : []
-            }
+        }), */
+        return this.http
+        .get<Recipe[]>(
+          'https://brocclivshop-default-rtdb.firebaseio.com/recipes.json',
+        )
+        .pipe(
+          map((recipes) => { // rxjs operrator
+            return recipes.map((recipe) => { // js array method
+              return {
+                ...recipe,
+                ingredients:recipe.ingredients ? recipe.ingredients : []
+              }
+            })
+          }),
+          tap((recipes) => {
+            this.recipeService.setRecipes(recipes)
           })
-        }),
-        tap((recipes) => {
-          this.recipeService.setRecipes(recipes)
-        })
-      )
+        )
+      
     }
 }
