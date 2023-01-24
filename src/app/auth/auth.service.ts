@@ -19,6 +19,8 @@ export interface AuthResData{
 export class AuthService {
 
   user=new BehaviorSubject<User>(null) // it has to be initialized
+  private tokenExpirationTimer:any;
+
 
   constructor(private http:HttpClient, private router:Router) { }
   signUp(email:string,password:string){
@@ -81,22 +83,52 @@ export class AuthService {
   logout(){
     this.user.next(null)
     this.router.navigate(['/auth'])
+    //localStorage.clear() // this one will clear everything, even the data for the others applications
+    localStorage.removeItem('userData')
+    if(this.tokenExpirationTimer){
+      clearTimeout( this.tokenExpirationTimer)
+    }
+    this.tokenExpirationTimer=null
+  }
+
+  autoLogout(expirationDuration:number){
+    console.log('expirationDuration:',expirationDuration)
+    this.tokenExpirationTimer=setTimeout(() => {
+      this.logout()
+    }, expirationDuration);
+  }
+
+  autoLogin(){
+    //this object is not user instance
+    const userData:{
+      email:string,
+      id:string,
+      _token:string,
+      _tokenExpirationDate:string // the type after pasing is string
+    }=JSON.parse(localStorage.getItem('userData'))
+    if(!userData){
+      return
+    }
+    //we create new user instanc
+    const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
+    if(loadedUser.token){
+       this.user.next(loadedUser)
+       //logout after remained time.
+       const expirationDuration=new Date(userData._tokenExpirationDate).getTime()-new Date().getTime()
+       this.autoLogout(expirationDuration)
+    }
   }
 
   private handleAuthentication(email:string,userId:string,token:string,expiresIn:number){
-
       const expirationDate=new Date( // convert back everything back to Date format
         new Date().getTime() //current timestamp in millisecond since the beginning of the time,1970
         +
         expiresIn*1000 // just convert second to millisecond
       ); 
-      const user=new User(
-        email,
-        userId,
-        token,
-        expirationDate
-      )
+      const user=new User(email,userId,token,expirationDate)
       this.user.next(user)
+      this.autoLogout(expiresIn*1000) // right after the user instance is created
+      localStorage.setItem('userData',JSON.stringify(user))
   }
 
   private handleError(errRes:HttpErrorResponse){
