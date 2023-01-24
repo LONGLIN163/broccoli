@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, Subject, tap, throwError } from 'rxjs';
 import { User } from './auth/user.model';
 
@@ -17,12 +18,9 @@ export interface AuthResData{
 })
 export class AuthService {
 
-  //user=new Subject<User>();
-  //token:string=null
+  user=new BehaviorSubject<User>(null) // it has to be initialized
 
-  user=new BehaviorSubject<User>(null)
-
-  constructor(private http:HttpClient) { }
+  constructor(private http:HttpClient, private router:Router) { }
   signUp(email:string,password:string){
     const API_KEY='AIzaSyBmKK5_b36ULLLtXNrZkdkrk723-vJ8dMA'
     const signUpUrl='https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+`${API_KEY}`
@@ -78,6 +76,11 @@ export class AuthService {
         }
       )
     )
+  }
+
+  logout(){
+    this.user.next(null)
+    this.router.navigate(['/auth'])
   }
 
   private handleAuthentication(email:string,userId:string,token:string,expiresIn:number){
