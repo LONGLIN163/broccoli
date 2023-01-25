@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { AlertComponent } from 'src/app/shared/alert/alert.component';
-import { PlaceholderDirective } from 'src/app/shared/placeholder/placeholder.directive';
+import { PlaceholderDirective } from 'src/app/shared/placeholder.directive';
 import { AuthService,AuthResData } from '../auth.service';
 
 @Component({
