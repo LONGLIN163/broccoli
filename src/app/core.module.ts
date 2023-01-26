@@ -12,7 +12,8 @@ import { ShoppingListService } from './shopping-list/shopping-list-services/shop
           provide:HTTP_INTERCEPTORS,
           useClass:AuthInterceptorService,
           multi:true
-        }
+        },
+        //LoggingService
     ],
 })
 export class CoreModule { }
