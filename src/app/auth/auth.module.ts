@@ -13,7 +13,7 @@ import { AuthComponent } from './auth/auth.component';
         HttpClientModule,
         FormsModule,
         RouterModule.forChild([
-            { path:'auth',component:AuthComponent } 
+            { path:'',component:AuthComponent } 
         ]),
         SharedModule
     ],
