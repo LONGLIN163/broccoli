@@ -4,7 +4,6 @@ import { HeaderComponent } from './header/header.component';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.moudule';
-import { RecipesModule } from './recipes/recipes.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
@@ -18,7 +17,6 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    RecipesModule,
     ShoppingListModule,
     SharedModule,
     AuthModule,

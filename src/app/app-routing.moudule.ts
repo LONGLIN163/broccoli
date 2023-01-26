@@ -5,6 +5,10 @@ const appRoutes:Routes=[
         path:'', // empty path is part of every route
         redirectTo:'/recipes',
         pathMatch:'full'
+    },
+    {
+      path:'recipes',
+      loadChildren: () => import('./recipes/recipes.module').then(m => m.RecipesModule)
     }
 ]
 
