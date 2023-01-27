@@ -1,9 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, Subject, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { User } from './auth/user.model';
-
+import { environment } from 'src/environments/environment';
 export interface AuthResData{
   idToken:string,
   email:string,
@@ -12,20 +12,16 @@ export interface AuthResData{
   localId:string,
   registered?:string
 }
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
   user=new BehaviorSubject<User>(null) // it has to be initialized
   private tokenExpirationTimer:any;
-
-
   constructor(private http:HttpClient, private router:Router) { }
   signUp(email:string,password:string){
-    const API_KEY='AIzaSyBmKK5_b36ULLLtXNrZkdkrk723-vJ8dMA'
-    const signUpUrl='https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+`${API_KEY}`
+
+    const signUpUrl='https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+environment.firebaseAPIKey
     return this.http.post<AuthResData>(signUpUrl,{
       email:email,
       password:password,
@@ -35,18 +31,6 @@ export class AuthService {
       catchError(this.handleError),
       tap(
         (resData) => { 
-/*         const expirationDate=new Date( // convert back everything back to Date format
-          new Date().getTime() //current timestamp in millisecond since the beginning of the time,1970
-          +
-          +resData.expiresIn*1000 // just convert second to millisecond
-        ); 
-        const user=new User(
-          resData.email,
-          resData.localId,
-          resData.idToken,
-          expirationDate
-        )
-        this.user.next(user) */
         this.handleAuthentication(
           resData.email,
           resData.localId,
@@ -58,8 +42,7 @@ export class AuthService {
   }
 
   login(email:string,password:string){
-    const API_KEY='AIzaSyBmKK5_b36ULLLtXNrZkdkrk723-vJ8dMA'
-    const signInUrl='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+`${API_KEY}`
+    const signInUrl='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+environment.firebaseAPIKey
     return this.http.post<AuthResData>(signInUrl,{
       email:email,
       password:password,
