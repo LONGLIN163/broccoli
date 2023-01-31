@@ -101,7 +101,7 @@ export class AuthService {
     //we create new user instanc
     const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
     if(loadedUser.token){
-      this.store.dispatch(new AuthActions.Login(
+      this.store.dispatch(new AuthActions.AuthenticateSuccess(
         {
           email:loadedUser.email,
           userId:loadedUser.id,
@@ -123,7 +123,7 @@ export class AuthService {
         expiresIn*1000 // just convert second to millisecond
       ); 
       const user=new User(email,userId,token,expirationDate)
-      this.store.dispatch(new AuthActions.Login({
+      this.store.dispatch(new AuthActions.AuthenticateSuccess({
         email:email,
         userId:userId,
         token:token,
