@@ -5,6 +5,11 @@ import { Observable, Subscription } from 'rxjs';
 import { AlertComponent } from 'src/app/shared/alert/alert.component';
 import { PlaceholderDirective } from 'src/app/shared/placeholder.directive';
 import { AuthService,AuthResData } from '../auth.service';
+import * as fromAppStore from '../../appStore/app.Reducer';
+import { Store } from '@ngrx/store';
+import * as AuthActions from "../store/auth.actions"
+import { AuthState } from '../store/auth.reducer';
+
 
 @Component({
   selector: 'app-auth',
@@ -20,9 +25,21 @@ export class AuthComponent implements OnInit,OnDestroy{
   constructor(
     private authService:AuthService, 
     private router:Router,
-    private cfr:ComponentFactoryResolver) { }
+    private cfr:ComponentFactoryResolver,
+    private store:Store<fromAppStore.AppState>
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.store.select('auth').subscribe(
+      (authState: AuthState) => {
+        this.isLoading=authState.loading
+        this.error=authState.authError     
+        if(this.error){
+          this.showErrAlert(this.error)
+        }
+      }
+     )
+  }
   
   onSubmit(form:NgForm){
     let authObs:Observable<AuthResData>;
@@ -34,21 +51,10 @@ export class AuthComponent implements OnInit,OnDestroy{
      const password=form.value.password
 
      if(this.isLoginMode){
-      authObs=this.authService.login(email,password)
+      this.store.dispatch(new AuthActions.LoginStart({email,password}))
      }else{
       authObs=this.authService.signUp(email,password)
      }
-     authObs.subscribe(
-       (res) => {
-         console.log("res---",res)
-         this.isLoading=false
-         this.router.navigate(['./recipes'])
-       },(errorMessage) => {
-         this.error=errorMessage
-         this.showErrAlert(errorMessage)
-         this.isLoading=false
-       }
-     )
      form.reset()
   }
   onSwitchMode(){

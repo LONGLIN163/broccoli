@@ -101,10 +101,18 @@ export class AuthService {
     //we create new user instanc
     const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
     if(loadedUser.token){
-       this.store.dispatch(new AuthActions.Login(loadedUser))
-       //logout after remained time.
-       const expirationDuration=new Date(userData._tokenExpirationDate).getTime()-new Date().getTime()
-       this.autoLogout(expirationDuration)
+      this.store.dispatch(new AuthActions.Login(
+        {
+          email:loadedUser.email,
+          userId:loadedUser.id,
+          token:loadedUser.token,
+          expirationDate:new Date(userData._tokenExpirationDate)
+        }
+      ))
+
+      const expirationDuration=new Date(userData._tokenExpirationDate).getTime()-new Date().getTime()
+      //logout after remained time.
+      this.autoLogout(expirationDuration)
     }
   }
 
@@ -115,7 +123,12 @@ export class AuthService {
         expiresIn*1000 // just convert second to millisecond
       ); 
       const user=new User(email,userId,token,expirationDate)
-      this.store.dispatch(new AuthActions.Login(user))
+      this.store.dispatch(new AuthActions.Login({
+        email:email,
+        userId:userId,
+        token:token,
+        expirationDate:expirationDate}
+      ))
 
       this.autoLogout(expiresIn*1000) // right after the user instance is created
       localStorage.setItem('userData',JSON.stringify(user))
