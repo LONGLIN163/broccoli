@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { User } from './auth/user.model';
 import { environment } from 'src/environments/environment';
+import * as fromAppStore from '../appStore/app.Reducer';
+import { Store } from '@ngrx/store';
+import * as AuthActions from "./store/auth.actions"
+
 export interface AuthResData{
   idToken:string,
   email:string,
@@ -16,9 +20,13 @@ export interface AuthResData{
   providedIn: 'root'
 })
 export class AuthService {
-  user=new BehaviorSubject<User>(null) // it has to be initialized
+  //user=new BehaviorSubject<User>(null) // it has to be initialized
   private tokenExpirationTimer:any;
-  constructor(private http:HttpClient, private router:Router) { }
+  constructor(
+    private http:HttpClient, 
+    private router:Router,
+    private store:Store<fromAppStore.AppState>
+  ) { }
   signUp(email:string,password:string){
 
     const signUpUrl='https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+environment.firebaseAPIKey
@@ -64,10 +72,9 @@ export class AuthService {
   }
 
   logout(){
-    this.user.next(null)
+    this.store.dispatch(new  AuthActions.Logout())
     this.router.navigate(['/auth'])
-    //localStorage.clear() // this one will clear everything, even the data for the others applications
-    localStorage.removeItem('userData')
+     localStorage.removeItem('userData')
     if(this.tokenExpirationTimer){
       clearTimeout( this.tokenExpirationTimer)
     }
@@ -75,7 +82,6 @@ export class AuthService {
   }
 
   autoLogout(expirationDuration:number){
-    console.log('expirationDuration:',expirationDuration)
     this.tokenExpirationTimer=setTimeout(() => {
       this.logout()
     }, expirationDuration);
@@ -95,7 +101,7 @@ export class AuthService {
     //we create new user instanc
     const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
     if(loadedUser.token){
-       this.user.next(loadedUser)
+       this.store.dispatch(new AuthActions.Login(loadedUser))
        //logout after remained time.
        const expirationDuration=new Date(userData._tokenExpirationDate).getTime()-new Date().getTime()
        this.autoLogout(expirationDuration)
@@ -109,7 +115,8 @@ export class AuthService {
         expiresIn*1000 // just convert second to millisecond
       ); 
       const user=new User(email,userId,token,expirationDate)
-      this.user.next(user)
+      this.store.dispatch(new AuthActions.Login(user))
+
       this.autoLogout(expiresIn*1000) // right after the user instance is created
       localStorage.setItem('userData',JSON.stringify(user))
   }

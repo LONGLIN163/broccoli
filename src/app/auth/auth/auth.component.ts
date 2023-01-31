@@ -60,7 +60,6 @@ export class AuthComponent implements OnInit,OnDestroy{
 
   private closeSub:Subscription;
   showErrAlert(errorMessage:string){
-     //const alert=new AlertComponent() // we can not do this,it is ts code no angular
      const alertCmpFatory=this.cfr.resolveComponentFactory(AlertComponent)
      const hostViewContainerRef=this.alertHost.vcr
      hostViewContainerRef.clear()// clear everything renderd before
