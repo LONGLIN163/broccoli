@@ -3,14 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { RecipeService } from '../recipes/recipe_services/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
 import { map, tap } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { AppState } from '../appStore/app.Reducer';
+import { Store } from '@ngrx/store';
+import * as RecipesActions from "../recipes/store/recipe.actions"
 
 @Injectable({providedIn: 'root'})
 export class DataStorageService {
     constructor(
       private http: HttpClient, 
       private recipeService:RecipeService,
-      private authService:AuthService
+      private store:Store<AppState>
     ) { }
 
     storeRecipes(){
@@ -24,18 +26,6 @@ export class DataStorageService {
     }
 
     fetchRecipes(){
-/*       return this.authService.user.pipe(
-        take(1), // take 1 value from the obs already exist,then automatically unsubscribe
-        exhaustMap((user) => {
-          return this.http
-          .get<Recipe[]>(
-            'https://brocclivshop-default-rtdb.firebaseio.com/recipes.json',
-            //'https://brocclivshop-default-rtdb.firebaseio.com/recipes.json?auth='+user.token
-            {
-              params:new HttpParams().set('auth',user.token)
-            }
-          )
-        }), */
         return this.http
         .get<Recipe[]>(
           'https://brocclivshop-default-rtdb.firebaseio.com/recipes.json',
@@ -50,7 +40,7 @@ export class DataStorageService {
             })
           }),
           tap((recipes) => {
-            this.recipeService.setRecipes(recipes)
+            this.store.dispatch(new RecipesActions.SetRecipes(recipes))
           })
         )
       

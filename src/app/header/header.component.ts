@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { map, Subscription } from "rxjs";
-import { AuthService } from "../auth/auth.service";
 import { DataStorageService } from "../shared/data-storage.service";
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../appStore/app.Reducer';
@@ -17,7 +16,6 @@ export class HeaderComponent implements OnInit,OnDestroy{
   private userSub:Subscription
   constructor(
     private dss:DataStorageService,
-    private authService:AuthService,
     private store:Store<fromAppStore.AppState>
     ){}
 
@@ -26,7 +24,6 @@ export class HeaderComponent implements OnInit,OnDestroy{
   }
 
   ngOnInit(): void {
-    //this.userSub=this.authService.user.subscribe(
     this.userSub=this.store.select('auth')
     .pipe(
       map((authState) => {
