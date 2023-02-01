@@ -2,15 +2,6 @@ import { Injectable } from '@angular/core';
 import * as fromAppStore from '../appStore/app.Reducer';
 import { Store } from '@ngrx/store';
 import * as AuthActions from "./store/auth.actions"
-
-export interface AuthResData{
-  idToken:string,
-  email:string,
-  refreshToken:string,
-  expiresIn:string,
-  localId:string,
-  registered?:string
-}
 @Injectable({
   providedIn: 'root'
 })

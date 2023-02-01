@@ -4,9 +4,18 @@ import { Router } from "@angular/router";
 import { Actions,Effect,ofType } from "@ngrx/effects";
 import { catchError, map, of, switchMap, tap, throwError } from "rxjs";
 import { environment } from "src/environments/environment";
-import { AuthResData, AuthService } from "../auth.service";
+import { AuthService } from "../auth.service";
 import { User } from "../auth/user.model";
 import * as AuthActions from "./auth.actions";
+
+interface AuthResData{
+  idToken:string,
+  email:string,
+  refreshToken:string,
+  expiresIn:string,
+  localId:string,
+  registered?:string
+}
 
 // const handleAuthentication=(
 //   email:string,
@@ -35,7 +44,6 @@ const handleAuthentication=(resData:AuthResData)=>{
     expirationDate:expirationDate
   })
 }
-
 const handleError=(errRes:HttpErrorResponse)=>{
   console.log("errRes:",errRes)
 
@@ -59,7 +67,6 @@ const handleError=(errRes:HttpErrorResponse)=>{
 
   return of(new AuthActions.AuthenticateFail(errorMessage))
 }
-
 @Injectable()
 export class AuthEffects {
   constructor(
