@@ -5,6 +5,7 @@ import { Actions,Effect,ofType } from "@ngrx/effects";
 import { catchError, map, of, switchMap, tap, throwError } from "rxjs";
 import { environment } from "src/environments/environment";
 import { AuthResData } from "../auth.service";
+import { User } from "../auth/user.model";
 import * as AuthActions from "./auth.actions";
 
 // const handleAuthentication=(
@@ -23,6 +24,10 @@ import * as AuthActions from "./auth.actions";
 // }
 const handleAuthentication=(resData:AuthResData)=>{
   const expirationDate=new Date( new Date().getTime() + +resData.expiresIn*1000 )
+
+  const user=new User(resData.email,resData.localId,resData.idToken,expirationDate)
+  localStorage.setItem('userData',JSON.stringify(user))
+
   return new AuthActions.AuthenticateSuccess({
     email:resData.email,
     userId:resData.localId,
@@ -126,11 +131,48 @@ export class AuthEffects {
     )
   )
 
+  @Effect() // with this params,in the end it would not dispatch any action
+  authAutoLogin=this.actions$.pipe(
+    ofType(AuthActions.AUTO_LOGIN),
+    map(() => {
+      //this object is not user instance
+      const userData:{
+        email:string,
+        id:string,
+        _token:string,
+        _tokenExpirationDate:string // the type after pasing is string
+      }=JSON.parse(localStorage.getItem('userData'))
+      if(!userData){
+        return
+      }
+      //we create new user instanc
+      const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
+      if(loadedUser.token){
+        return new AuthActions.AuthenticateSuccess( // if user exist,dispatch login action
+          {
+            email:loadedUser.email,
+            userId:loadedUser.id,
+            token:loadedUser.token,
+            expirationDate:new Date(userData._tokenExpirationDate)
+          }
+        ) 
+      }
+    })
+  )
+
   @Effect({dispatch:false}) // with this params,in the end it would not dispatch any action
-  authSuccess=this.actions$.pipe(
-    ofType(AuthActions.AUTHENTICATE_SUCCESS),
+  authRedirect=this.actions$.pipe(
+    ofType(AuthActions.AUTHENTICATE_SUCCESS,AuthActions.LOGOUT),
     tap(() => {
       this.router.navigate(['/'])
+    }
+  ))
+
+  @Effect({dispatch:false}) // with this params,in the end it would not dispatch any action
+  authLogout=this.actions$.pipe(
+    ofType(AuthActions.LOGOUT),
+    tap(() => {
+      localStorage.removeItem('userData')
     }
   ))
 }

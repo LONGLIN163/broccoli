@@ -1,4 +1,3 @@
-import { Action } from "@ngrx/store"
 import { User } from "../auth/user.model"
 import * as AuthActions from "./auth.actions"
 
@@ -16,6 +15,8 @@ const initialState : AuthState = {
 
 export function authReducer(state = initialState, action:AuthActions.AuthActions){
   switch (action.type) {
+
+    case AuthActions.SIGNUP_START:
     case AuthActions.LOGIN_START:
       return { 
         ...state, 
@@ -49,6 +50,11 @@ export function authReducer(state = initialState, action:AuthActions.AuthActions
       return { 
         ...state, 
         user:null 
+      }
+    case AuthActions.CLEAR_ERROR:
+      return { 
+        ...state, 
+        authError:null 
       }
 
     default:

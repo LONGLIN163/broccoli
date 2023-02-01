@@ -1,9 +1,8 @@
-import { ANIMATION_MODULE_TYPE, Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AlertComponent } from 'src/app/shared/alert/alert.component';
 import { PlaceholderDirective } from 'src/app/shared/placeholder.directive';
-import { AuthService } from '../auth.service';
 import * as fromAppStore from '../../appStore/app.Reducer';
 import { Store } from '@ngrx/store';
 import * as AuthActions from "../store/auth.actions"
@@ -19,14 +18,15 @@ export class AuthComponent implements OnInit,OnDestroy{
   isLoading=false
   error:string=null
   @ViewChild(PlaceholderDirective) alertHost:PlaceholderDirective;
-
+  
+  private storeSub:Subscription;
   constructor(
     private cfr:ComponentFactoryResolver,
     private store:Store<fromAppStore.AppState>
-  ) { }
-
-  ngOnInit(): void {
-    this.store.select('auth').subscribe(
+    ) { }
+    
+    ngOnInit(): void {
+    this.storeSub=this.store.select('auth').subscribe(
       (authState: AuthState) => {
         this.isLoading=authState.loading
         this.error=authState.authError     
@@ -54,8 +54,10 @@ export class AuthComponent implements OnInit,OnDestroy{
   onSwitchMode(){
     this.isLoginMode=!this.isLoginMode
   }
+
+  //*********this one is relate ngIf aproach of closing the spinner********** */
   onHandleErrAlert(){
-    this.error=null
+    this.store.dispatch(new AuthActions.ClearError())
   }
 
   private closeSub:Subscription;
@@ -77,6 +79,9 @@ export class AuthComponent implements OnInit,OnDestroy{
   ngOnDestroy(): void {
     if(this.closeSub){
       this.closeSub.unsubscribe(); 
+    }
+    if(this.storeSub){
+      this.storeSub.unsubscribe()
     }
   }
 }

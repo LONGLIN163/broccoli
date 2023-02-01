@@ -1,9 +1,7 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { User } from './auth/user.model';
-import { environment } from 'src/environments/environment';
 import * as fromAppStore from '../appStore/app.Reducer';
 import { Store } from '@ngrx/store';
 import * as AuthActions from "./store/auth.actions"
@@ -27,53 +25,9 @@ export class AuthService {
     private router:Router,
     private store:Store<fromAppStore.AppState>
   ) { }
-  signUp(email:string,password:string){
-
-    const signUpUrl='https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+environment.firebaseAPIKey
-    return this.http.post<AuthResData>(signUpUrl,{
-      email:email,
-      password:password,
-      returnSecureToken:true
-    })
-    .pipe(
-      catchError(this.handleError),
-      tap(
-        (resData) => { 
-        this.handleAuthentication(
-          resData.email,
-          resData.localId,
-          resData.idToken,
-          +resData.expiresIn
-        );
-      })
-    )
-  }
-
-  login(email:string,password:string){
-    const signInUrl='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+environment.firebaseAPIKey
-    return this.http.post<AuthResData>(signInUrl,{
-      email:email,
-      password:password,
-      returnSecureToken:true
-    })
-    .pipe(
-      catchError(this.handleError),
-      tap(
-        (resData) => {
-          this.handleAuthentication(
-            resData.email,
-            resData.localId,
-            resData.idToken,
-            +resData.expiresIn
-          );
-        }
-      )
-    )
-  }
 
   logout(){
     this.store.dispatch(new  AuthActions.Logout())
-    this.router.navigate(['/auth'])
      localStorage.removeItem('userData')
     if(this.tokenExpirationTimer){
       clearTimeout( this.tokenExpirationTimer)
@@ -116,42 +70,22 @@ export class AuthService {
     }
   }
 
-  private handleAuthentication(email:string,userId:string,token:string,expiresIn:number){
-      const expirationDate=new Date( // convert back everything back to Date format
-        new Date().getTime() //current timestamp in millisecond since the beginning of the time,1970
-        +
-        expiresIn*1000 // just convert second to millisecond
-      ); 
-      const user=new User(email,userId,token,expirationDate)
-      this.store.dispatch(new AuthActions.AuthenticateSuccess({
-        email:email,
-        userId:userId,
-        token:token,
-        expirationDate:expirationDate}
-      ))
+  // private handleAuthentication(email:string,userId:string,token:string,expiresIn:number){
+  //     const expirationDate=new Date( // convert back everything back to Date format
+  //       new Date().getTime() //current timestamp in millisecond since the beginning of the time,1970
+  //       +
+  //       expiresIn*1000 // just convert second to millisecond
+  //     ); 
+  //     const user=new User(email,userId,token,expirationDate)
+  //     this.store.dispatch(new AuthActions.AuthenticateSuccess({
+  //       email:email,
+  //       userId:userId,
+  //       token:token,
+  //       expirationDate:expirationDate}
+  //     ))
 
-      this.autoLogout(expiresIn*1000) // right after the user instance is created
-      localStorage.setItem('userData',JSON.stringify(user))
-  }
+  //     this.autoLogout(expiresIn*1000) // right after the user instance is created
+  //     localStorage.setItem('userData',JSON.stringify(user))
+  // }
 
-  private handleError(errRes:HttpErrorResponse){
-    let errorMessage='An error occurred!!!'
-    if(!errRes.error || !errRes.error.error){
-     return throwError(errorMessage)
-    }
-
-    switch (errRes.error.error.message) {
-      case 'EMAIL_EXISTS':
-        errorMessage='This email exists already.'
-        break;    
-      case 'EMAIL_NOT_FOUND':
-        errorMessage='This email doesnt exist.'
-        break;    
-      case 'INVALID_PASSWORD':
-        errorMessage='This password is not correct.'
-        break;    
-    }
-
-    return throwError(errorMessage)
-  }
 }
