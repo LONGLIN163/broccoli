@@ -1,5 +1,4 @@
 import { Action } from "@ngrx/store"
-
 export const SIGNUP_START='[Auth] Signup Start'
 export const LOGIN_START='[Auth] Login Start'
 export const AUTHENTICATE_SUCCESS='[Auth] Authenticate Success'

@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 import { Actions,Effect,ofType } from "@ngrx/effects";
 import { catchError, map, of, switchMap, tap, throwError } from "rxjs";
 import { environment } from "src/environments/environment";
-import { AuthResData } from "../auth.service";
+import { AuthResData, AuthService } from "../auth.service";
 import { User } from "../auth/user.model";
 import * as AuthActions from "./auth.actions";
 
@@ -65,7 +65,8 @@ export class AuthEffects {
   constructor(
     private actions$:Actions,
     private http:HttpClient, 
-    private router:Router
+    private router:Router,
+    private authService:AuthService
   ){}
 
   @Effect()
@@ -79,6 +80,11 @@ export class AuthEffects {
         returnSecureToken:true
       })
       .pipe(
+        tap(
+          (resData) => {
+            this.authService.setLogoutTimer(+resData.expiresIn*1000)
+          }
+        ),
         map( //map return everything into a observable
           (resData:AuthResData) => { 
             // return handleAuthentication(
@@ -92,7 +98,6 @@ export class AuthEffects {
         catchError((errRes:HttpErrorResponse)=>{ //catchError doest not like map, we have to use of() to wrap everything into an obserable first
           //return of() // create a new observable
           return handleError(errRes)
-
         })
       ) 
      }
@@ -104,7 +109,6 @@ export class AuthEffects {
     ofType(AuthActions.LOGIN_START),
     switchMap(
       (action:AuthActions.LoginStart) => {
-        console.log("authData:",action)
         const signInUrl='https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+environment.firebaseAPIKey
         return this.http.post<AuthResData>(signInUrl,{
             email:action.payload.email,
@@ -112,6 +116,11 @@ export class AuthEffects {
             returnSecureToken:true
           })
           .pipe(
+            tap(
+              (resData) => {
+                this.authService.setLogoutTimer(+resData.expiresIn*1000)
+              }
+            ),
             map( //map return everything into a observable
               (resData:AuthResData) => { 
                 // return handleAuthentication(
@@ -123,7 +132,6 @@ export class AuthEffects {
                 return handleAuthentication(resData);        
             }),
             catchError((errRes:HttpErrorResponse)=>{ //catchError doest not like map, we have to use of() to wrap everything into an obserable first
-              //return of() // create a new observable
               return handleError(errRes)
             })
           ) 
@@ -143,11 +151,15 @@ export class AuthEffects {
         _tokenExpirationDate:string // the type after pasing is string
       }=JSON.parse(localStorage.getItem('userData'))
       if(!userData){
-        return
+        return { type :'haha'}
       }
       //we create new user instanc
       const loadedUser=new User(userData.email,userData.id,userData._token,new Date(userData._tokenExpirationDate))
       if(loadedUser.token){
+
+        const expirationDuration=new Date(userData._tokenExpirationDate).getTime()-new Date().getTime()
+        this.authService.setLogoutTimer(expirationDuration)
+
         return new AuthActions.AuthenticateSuccess( // if user exist,dispatch login action
           {
             email:loadedUser.email,
@@ -157,12 +169,14 @@ export class AuthEffects {
           }
         ) 
       }
+
+      return { type :'haha'}
     })
   )
 
   @Effect({dispatch:false}) // with this params,in the end it would not dispatch any action
   authRedirect=this.actions$.pipe(
-    ofType(AuthActions.AUTHENTICATE_SUCCESS,AuthActions.LOGOUT),
+    ofType(AuthActions.AUTHENTICATE_SUCCESS),
     tap(() => {
       this.router.navigate(['/'])
     }
@@ -172,7 +186,10 @@ export class AuthEffects {
   authLogout=this.actions$.pipe(
     ofType(AuthActions.LOGOUT),
     tap(() => {
+      this.authService.clearLogoutTimer()
       localStorage.removeItem('userData')
+      console.log("hahahhahhahahahha")
+      this.router.navigate(['/auth'])
     }
   ))
 }
