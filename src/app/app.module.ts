@@ -15,6 +15,7 @@ import { AuthEffects } from './auth/store/auth.effects';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools'
 import { environment } from 'src/environments/environment';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { RecipesEffects } from './recipes/store/recipe.effects';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
     SharedModule,
     CoreModule,
     StoreModule.forRoot(fromAppStore.appReducer),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects,RecipesEffects]),
     StoreDevtoolsModule.instrument({logOnly:environment.production }),
     // Connects RouterModule with StoreModule
     StoreRouterConnectingModule.forRoot()

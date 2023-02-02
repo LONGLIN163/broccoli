@@ -18,6 +18,10 @@ export function recipeReducer(state = initialState, action:RecipesActions.Recipe
         ...state, 
         recipes:[...action.payload]
     }
+  case RecipesActions.FETCH_RECIPES:
+    return { 
+        ...state, 
+    }
 
   default:
     return state

@@ -4,6 +4,7 @@ import { DataStorageService } from "../shared/data-storage.service";
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../appStore/app.Reducer';
 import * as AuthActions from "../auth/store/auth.actions"
+import * as RecipesActions from "../recipes/store/recipe.actions"
 
 
 @Component({
@@ -45,6 +46,6 @@ export class HeaderComponent implements OnInit,OnDestroy{
   }
 
   onFetchData(){
-    this.dss.fetchRecipes().subscribe()
+    this.store.dispatch(new RecipesActions.FetchRecipes())
   }
 }
