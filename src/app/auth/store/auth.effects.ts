@@ -41,7 +41,8 @@ const handleAuthentication=(resData:AuthResData)=>{
     email:resData.email,
     userId:resData.localId,
     token:resData.idToken,
-    expirationDate:expirationDate
+    expirationDate:expirationDate,
+    redirect:true
   })
 }
 const handleError=(errRes:HttpErrorResponse)=>{
@@ -172,7 +173,8 @@ export class AuthEffects {
             email:loadedUser.email,
             userId:loadedUser.id,
             token:loadedUser.token,
-            expirationDate:new Date(userData._tokenExpirationDate)
+            expirationDate:new Date(userData._tokenExpirationDate),
+            redirect:false
           }
         ) 
       }
@@ -184,8 +186,10 @@ export class AuthEffects {
   @Effect({dispatch:false}) // with this params,in the end it would not dispatch any action
   authRedirect=this.actions$.pipe(
     ofType(AuthActions.AUTHENTICATE_SUCCESS),
-    tap(() => {
-      this.router.navigate(['/'])
+    tap((authSuccessAction:AuthActions.AuthenticateSuccess) => {
+      if(authSuccessAction.payload.redirect){
+        this.router.navigate(['/'])
+      }
     }
   ))
 
