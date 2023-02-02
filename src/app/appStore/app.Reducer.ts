@@ -8,12 +8,12 @@ import * as fromRecipeStore from "../recipes/store/recipe.reducer"
 export interface AppState{
     shoppingList: fromShoppingListStore.ShoppingListState
     auth: fromAuthStore.AuthState
-    recipe:fromRecipeStore.RecipesState
+    recipes:fromRecipeStore.RecipesState
 }
 
 
 export const appReducer:ActionReducerMap<AppState>={
     shoppingList:fromShoppingListStore.shoppingListReducer,
     auth:fromAuthStore.authReducer,
-    recipe:fromRecipeStore.recipeReducer
+    recipes:fromRecipeStore.recipeReducer
 }
