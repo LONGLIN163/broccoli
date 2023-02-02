@@ -22,6 +22,30 @@ export function recipeReducer(state = initialState, action:RecipesActions.Recipe
     return { 
         ...state, 
     }
+  case RecipesActions.ADD_RECIPE:
+    return { 
+        ...state, 
+        recipes:[
+          ...state.recipes,
+          action.payload
+        ]
+    }
+  case RecipesActions.DELETE_RECIPE:
+    return { 
+        ...state, 
+        recipes:state.recipes.filter((recipe,index) => index!==action.payload)
+    }
+  case RecipesActions.UPDATE_RECIPE:
+    const updatedRecipe={
+      ...state.recipes[action.payload.index],//pull out old recipe
+      ...action.payload.newRecipe//overwrite old recipe
+    }
+    const updatedRecipes=[...state.recipes]
+    updatedRecipes[action.payload.index]=updatedRecipe
+    return { 
+        ...state, 
+        recipes:updatedRecipes
+    }
 
   default:
     return state

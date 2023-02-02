@@ -1,24 +1,26 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params, Route, Router } from '@angular/router';
-import { RecipeService } from '../recipe_services/recipe.service';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppState } from '../../appStore/app.Reducer';
 import { Store } from '@ngrx/store';
-import { map, switchMap } from 'rxjs';
+import { map, Subscription, switchMap } from 'rxjs';
+import * as RecipesActions from "../store/recipe.actions"
+
+
 
 @Component({
   selector: 'app-recipe-edit',
   templateUrl: './recipe-edit.component.html',
   styleUrls: ['./recipe-edit.component.css']
 })
-export class RecipeEditComponent implements OnInit {
+export class RecipeEditComponent implements OnInit,OnDestroy  {
   id:number;
   editModel=false
   recipeForm:FormGroup
+  recipeSub:Subscription
 
   constructor(
     private route:ActivatedRoute,
-    private recipeService:RecipeService,
     private store:Store<AppState>,
     private router:Router) { }
 
@@ -32,6 +34,12 @@ export class RecipeEditComponent implements OnInit {
     )
   }
 
+  ngOnDestroy(): void {
+    if(this.recipeSub){
+      this.recipeSub.unsubscribe();
+    }
+  }
+
   private initForm(){
     let recipeName=''
     let recipeImagePath=''
@@ -39,14 +47,13 @@ export class RecipeEditComponent implements OnInit {
     let recipeIngredients=new FormArray([])
 
     if(this.editModel){
-      let recipe=null;
-      this.store.select('recipes')
+      this.recipeSub=this.store.select('recipes')
       .pipe(map(recipesState => {
           return recipesState.recipes.find((recipe,index) => {
               return index===this.id
             }
           )
-        }),
+        })
       )
       .subscribe(recipe=>{
         recipeName=recipe.name
@@ -93,9 +100,14 @@ export class RecipeEditComponent implements OnInit {
 
   onSubmit(){
     if(this.editModel){
-      this.recipeService.updateRecipe(this.id,this.recipeForm.value)
+      this.store.dispatch(new RecipesActions.UpdateRecipe(
+        {
+          index:this.id,
+          newRecipe:this.recipeForm.value
+        }
+      ))
     }else{
-      this.recipeService.addRecipe(this.recipeForm.value)
+      this.store.dispatch(new RecipesActions.AddRecipe(this.recipeForm.value))
     }
     this.router.navigate(['../'],{relativeTo:this.route})
   }
